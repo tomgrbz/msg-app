@@ -16,7 +16,7 @@ const io = new Server(httpServer, {
 io.on("connection", (socket) => {
     socket.on("chat message", (data) => {
         console.log("message received" + data)
-        socket.emit("received message", data)
+        io.emit("received message", data)
     })
 
 });
