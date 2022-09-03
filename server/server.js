@@ -14,10 +14,18 @@ const io = new Server(httpServer, {
     });
 
 io.on("connection", (socket) => {
-    socket.on("chat message", (data) => {
-        console.log("message received" + data)
-        io.emit("received message", data)
+
+    socket.on('join room', (roomId) => {
+        console.log(`user joined ${roomId}`)
+        socket.join(roomId)
     })
+
+    socket.on("chat message", (data) => {
+        console.log("message received " + data.msg)
+        console.log(`message sent to room: ${data.id}`)
+        io.to(data.id).emit("received message", data.msg)
+    })
+
 
 });
 
