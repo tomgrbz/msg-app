@@ -1,6 +1,6 @@
 import {Link} from "react-router-dom";
 import {Socket} from "socket.io-client";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 
 
 export const Login = ({socket}: { socket: Socket }) => {

@@ -1,14 +1,18 @@
 import './chatform.css'
 import {useEffect, useState} from "react";
-import {io, Socket} from "socket.io-client";
+import {Socket} from "socket.io-client";
 import {useParams} from "react-router-dom";
+import {ChatRoom} from "./chatroom";
+import {RoomModal} from "./roommodal";
 
-// const socket:Socket = io('http://localhost:3001')
+
 export const ChatForm = ({socket}: { socket: Socket }) => {
     const [room, setRoom] = useState<string>("")
     const [fieldState, setFieldState] = useState<string>("")
     const [messageReceived, setMessageReceived] = useState<string>("")
     const [listOfMsg, setListOfMsg] = useState<string[]>([])
+    const [newRoomFlag, setNewRoomFlag] = useState(false)
+
     const displayMessages: any = listOfMsg.map((v, i) => {
         return (<div key={i}>{v}</div>)
     })
@@ -16,19 +20,31 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
 
 
     useEffect(() => {
-        socket.on('received message', (msg: string) => {
-            setMessageReceived(msg)
-            let newMessages: string[] = [
-                ...listOfMsg, msg
-            ]
-            setListOfMsg(newMessages)
-            console.log(msg)
-            console.log(listOfMsg)
-        })
+            socket.on('received message', (msg: string) => {
+                if (!newRoomFlag) {
+                    setMessageReceived(msg)
+                    let newMessages: string[] = [
+                        ...listOfMsg, msg
+                    ]
+                    setListOfMsg(newMessages)
+                    console.log(msg)
+                    console.log(listOfMsg)
+                }
+                else {
+                    setNewRoomFlag(!newRoomFlag);
+                    setListOfMsg([])
+                }
+            })
+
 
     }, [displayMessages])
     useEffect( () => {
         setRoom(roomId)
+        setNewRoomFlag(!newRoomFlag)
+        const joinNewRoom = async () => {
+            await socket.emit("join room", roomId)
+        }
+        joinNewRoom().then(r => console.log('Joined new Room!'))
     }, [roomId])
 
     const sendMessage = async () => {
@@ -39,6 +55,8 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
     }
     return (
         <div className="mockup-window border bg-[length:200px_100px]">
+            <ChatRoom roomId={room}></ChatRoom>
+            <RoomModal socket={socket}></RoomModal>
             <div className='flex justify-center content-center'>
                 <form id="form" action="" onSubmit={e => {
                     e.preventDefault();
