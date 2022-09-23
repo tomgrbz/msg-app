@@ -1,6 +1,7 @@
 import {Link} from "react-router-dom";
 import {Socket} from "socket.io-client";
 import {useState} from "react";
+import {LoginInput} from "./logininput";
 
 
 export const Login = ({socket}: { socket: Socket }) => {
@@ -16,12 +17,8 @@ export const Login = ({socket}: { socket: Socket }) => {
 
             }
             }></form>
-            <input type='text' placeholder="Username"/>
-            <input type="text" autoComplete="off" placeholder="Room" onChange={e => {
-                setRoom(e.target.value)
-
-
-            }}/>
+            <LoginInput title={'What is your name?'}></LoginInput>
+            <LoginInput title={'What Room would you like to join?'} setRoom={setRoom}></LoginInput>
             <Link to={`/chat/${room}`} key={room}>
                 <button onClick={joinRoom}>
                     Join

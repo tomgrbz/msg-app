@@ -16,31 +16,28 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
     const displayMessages: any = listOfMsg.map((v, i) => {
         return (<div key={i}>{v}</div>)
     })
-    const {roomId}:any = useParams()
+    const {roomId}: any = useParams()
 
 
     useEffect(() => {
-            socket.on('received message', (msg: string) => {
-                if (!newRoomFlag) {
-                    setMessageReceived(msg)
-                    let newMessages: string[] = [
-                        ...listOfMsg, msg
-                    ]
-                    setListOfMsg(newMessages)
-                    console.log(msg)
-                    console.log(listOfMsg)
-                }
-                else {
-                    setNewRoomFlag(!newRoomFlag);
-                    setListOfMsg([])
-                }
-            })
+        socket.on('received message', (msg: string) => {
+            setMessageReceived(msg)
+            let newMessages: string[] = [
+                ...listOfMsg, msg
+            ]
+            setListOfMsg(newMessages)
+            console.log(msg)
+            console.log(listOfMsg)
+
+
+        })
 
 
     }, [displayMessages])
-    useEffect( () => {
+    useEffect(() => {
         setRoom(roomId)
         setNewRoomFlag(!newRoomFlag)
+        setListOfMsg([])
         const joinNewRoom = async () => {
             await socket.emit("join room", roomId)
         }

@@ -1,12 +1,11 @@
 import {useEffect, useState} from "react";
-import {Link, useParams} from "react-router-dom";
-import {RoomModal} from "./roommodal";
+import {Link} from "react-router-dom";
 
 
 export const ChatRoom = ({roomId}: {roomId: string}) => {
     const [rooms, setRooms] = useState<string[]>([])
     const [currentRoom, setCurrentRoom] = useState<string>('')
-    const [showModal, setShowModal] = useState<boolean>(false)
+
     const generateRooms: any = () => {
         return rooms.map((v, i) => {
             return (
@@ -25,7 +24,6 @@ export const ChatRoom = ({roomId}: {roomId: string}) => {
         }
         , [roomId])
 
-    useEffect(()=> {}, [showModal])
     return (
         <div>
                 {generateRooms()}

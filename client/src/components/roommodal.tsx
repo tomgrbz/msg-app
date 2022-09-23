@@ -21,7 +21,7 @@ export const RoomModal = ({socket}: {socket: Socket}) => {
             <Button onClick={toggleVisible}>Open Modal</Button>
             <Modal open={visible} onClickBackdrop={toggleVisible}>
                 <Modal.Header className="font-bold">
-                    Congratulations random Interner user!
+                    Join New Room
                 </Modal.Header>
 
                 <Modal.Body>
@@ -31,9 +31,9 @@ export const RoomModal = ({socket}: {socket: Socket}) => {
 
                     }}/>
                     <Link to={`/chat/${newRoom}`} key={newRoom}>
-                        <button onClick={joinRoom}>
+                        <Button onClick={joinRoom}>
                             Join
-                        </button>
+                        </Button>
                     </Link>
                 </Modal.Body>
             </Modal>
