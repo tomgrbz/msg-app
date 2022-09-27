@@ -5,35 +5,53 @@ import {useParams} from "react-router-dom";
 import {ChatRoom} from "./chatroom";
 import {RoomModal} from "./roommodal";
 import {Message} from "./message";
+import {list} from "postcss";
+
+class ChatMessage {
+    author: string | undefined;
+    messages: string[];
+    constructor(author: string, messages: string[]) {
+        this.author = author;
+        this.messages = messages
+    }
+}
 
 
 export const ChatForm = ({socket}: { socket: Socket }) => {
     const [room, setRoom] = useState<string>("")
     const [fieldState, setFieldState] = useState<string>("")
     const [messageReceived, setMessageReceived] = useState<string>("")
-    const [listOfMsg, setListOfMsg] = useState<string[]>([])
+    const [listOfMsg, setListOfMsg] = useState<ChatMessage[]>([])
+
 
     const inputRef = useRef(null) as any
     const {roomId, userName}: any = useParams()
 
 
-    const displayMessages: JSX.Element[]=
+    const displayMessages: JSX.Element[][] =
         listOfMsg.map((v, i) => {
-            return (
+            return v.messages.map((va, ind) => {
+                return (
+                    <Message key={ind} userName={v.author} content={va}></Message>
+                )
+            })
 
-                <Message key={i} userName={userName} content={v}></Message>
-            )
         })
 
     useEffect(() => {
-        socket.on('received message', (msg: string) => {
+        socket.on('received message', (msg: string, user: string) => {
             setMessageReceived(msg)
-            let newMessages: string[] = [
-                ...listOfMsg, msg
-            ]
-            setListOfMsg(newMessages)
+            let findAuthor = listOfMsg.find((msg) => msg?.author === user)
+            if (findAuthor) {
+                findAuthor.messages = [...findAuthor.messages, msg]
+            } else {
+                let newArr: string[] = [msg]
+                let newAuthor = new ChatMessage(user, newArr)
+                setListOfMsg([...listOfMsg, newAuthor])
+            }
         })
-    }, [displayMessages])
+        },
+            [displayMessages])
 
     useEffect(() => {
         setRoom(roomId)
@@ -46,7 +64,7 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
     }
     const sendMessage = async () => {
         if (fieldState !== '') {
-            await socket.emit("chat message", {msg: fieldState, id: room});
+            await socket.emit("chat message", {msg: fieldState, id: room, user: userName});
         }
         setFieldState("")
         autoFocus()

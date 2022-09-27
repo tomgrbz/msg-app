@@ -1,4 +1,4 @@
-export const Message = ({userName, content}: { userName: string, content: string }) => {
+export const Message = ({userName, content}: { userName?: string, content: string }) => {
 
     return (
         <div className="my-3 mx-2">
