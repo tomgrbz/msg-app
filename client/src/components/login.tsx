@@ -5,25 +5,26 @@ import {LoginInput} from "./logininput";
 
 
 export const Login = ({socket}: { socket: Socket }) => {
+    const [userName, setUserName] = useState('');
     const [room, setRoom] = useState('');
     const joinRoom = async () => {
         console.log(room)
         await socket.emit("join room", room)
     }
     return (
-        <div>
-            <form id="f" action="" onSubmit={e => {
-                e.preventDefault()
+        <div className="flex justify-center w-full items-center mt-72">
+            <div className="flex justify-center flex-col">
+                <form onSubmit={e => e.preventDefault()}>
+                <LoginInput title={'What is your name?'} setState={setUserName}></LoginInput>
 
-            }
-            }></form>
-            <LoginInput title={'What is your name?'}></LoginInput>
-            <LoginInput title={'What Room would you like to join?'} setRoom={setRoom}></LoginInput>
-            <Link to={`/chat/${room}`} key={room}>
-                <button onClick={joinRoom}>
-                    Join
-                </button>
-            </Link>
+                <LoginInput title={'What Room would you like to join?'} setState={setRoom}></LoginInput>
+                <Link to={`/chat/${room}/${userName}`} key={room}>
+                    <button className="btn btn-primary" onClick={joinRoom}>
+                        Join
+                    </button>
+                </Link>
+                </form>
+            </div>
         </div>
     )
 }

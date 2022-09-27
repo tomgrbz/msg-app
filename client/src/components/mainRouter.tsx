@@ -11,7 +11,7 @@ export const MainRouter = () => {
 
         <Routes>
             <Route path='/' element={<Login socket={socket}/>}/>
-            <Route path="/chat/:roomId" element={<ChatForm socket={socket}/>}> </Route>
+            <Route path="/chat/:roomId/:userName" element={<ChatForm socket={socket}/>}> </Route>
         </Routes>
 
     )
