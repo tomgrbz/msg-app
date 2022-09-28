@@ -23,7 +23,7 @@ io.on("connection", (socket) => {
     socket.on("chat message", (data) => {
         console.log("message received " + data.msg)
         console.log(`message sent to room: ${data.id}`)
-        io.to(data.id).emit("received message", data.msg, data.user)
+        io.to(data.id).emit("received message", data.msg, data.user, data.id)
     })
 
 

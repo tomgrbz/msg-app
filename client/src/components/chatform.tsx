@@ -9,49 +9,54 @@ import {list} from "postcss";
 
 class ChatMessage {
     author: string | undefined;
-    messages: string[];
-    constructor(author: string, messages: string[]) {
+    message: string;
+
+    constructor(author: string, message: string) {
         this.author = author;
-        this.messages = messages
+        this.message = message
     }
 }
 
+class Room {
+    name: string | undefined;
+    messages: ChatMessage[];
+
+    constructor(name: string, messages: ChatMessage[]) {
+        this.name = name;
+        this.messages = messages
+    }
+}
 
 export const ChatForm = ({socket}: { socket: Socket }) => {
     const [room, setRoom] = useState<string>("")
     const [fieldState, setFieldState] = useState<string>("")
     const [messageReceived, setMessageReceived] = useState<string>("")
     const [listOfMsg, setListOfMsg] = useState<ChatMessage[]>([])
+    const [listOfRoom, setListOfRoom] = useState<Room[]>([])
 
 
     const inputRef = useRef(null) as any
     const {roomId, userName}: any = useParams()
 
 
-    const displayMessages: JSX.Element[][] =
+    const displayMessages: JSX.Element[] =
         listOfMsg.map((v, i) => {
-            return v.messages.map((va, ind) => {
                 return (
-                    <Message key={ind} userName={v.author} content={va}></Message>
+                    <Message key={i} userName={v.author} content={v.message}></Message>
                 )
             })
 
-        })
+
 
     useEffect(() => {
-        socket.on('received message', (msg: string, user: string) => {
-            setMessageReceived(msg)
-            let findAuthor = listOfMsg.find((msg) => msg?.author === user)
-            if (findAuthor) {
-                findAuthor.messages = [...findAuthor.messages, msg]
-            } else {
-                let newArr: string[] = [msg]
-                let newAuthor = new ChatMessage(user, newArr)
+            socket.on('received message', (msg: string, user: string, r: string) => {
+                setMessageReceived(msg)
+                console.log(r)
+                let newAuthor = new ChatMessage(user, msg)
                 setListOfMsg([...listOfMsg, newAuthor])
-            }
-        })
+            })
         },
-            [displayMessages])
+        [displayMessages])
 
     useEffect(() => {
         setRoom(roomId)
