@@ -11,7 +11,6 @@ export const ChatRoom = ({roomId}: { roomId: string}) => {
             setRooms(rooms.slice(1))
 
         } else {
-            console.log(rooms);
             return rooms.map((v, i) => {
                 return (
                     <div key={i}>
