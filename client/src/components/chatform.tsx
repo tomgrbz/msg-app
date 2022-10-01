@@ -16,7 +16,6 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
     const [listOfMsg, setListOfMsg] = useState<any[]>([])
 
     const inputRef = useRef(null) as any
-    const formRef = useRef(null) as any
     const {roomId, userName}: any = useParams()
 
     useEffect(() => {
