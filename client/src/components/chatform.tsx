@@ -65,7 +65,7 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
                 }}
                 >
                     <div className="outline max-w-2xl">
-                        <ul className="h-96 w-full max-w-md overflow-auto list-none">
+                        <ul className="h-[300px] w-[500px] overflow-auto list-none">
                             <Messages messages={listOfMsg} user={userName}></Messages>
                         </ul>
                     </div>
