@@ -8,26 +8,6 @@ import {Message} from "./message";
 import {list} from "postcss";
 import {Messages} from "./messages";
 
-class ChatMessage {
-    author: string | undefined;
-    message: string;
-
-    constructor(author: string, message: string) {
-        this.author = author;
-        this.message = message
-    }
-}
-
-class Room {
-    name: string | undefined;
-    messages: ChatMessage[];
-
-    constructor(name: string, messages: ChatMessage[]) {
-        this.name = name;
-        this.messages = messages
-    }
-}
-
 export const ChatForm = ({socket}: { socket: Socket }) => {
     const [user, setUser] = useState<string>("")
     const [room, setRoom] = useState<string>("")
@@ -66,29 +46,31 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
         }
         setFieldState("")
         autoFocus()
+
     }
     const autoFocus = () => {
         inputRef.current.focus()
     }
     return (
-        <div className="mockup-window border bg-[length:200px_100px]">
+        <div className="">
             {/*<ChatRoom roomId={room}></ChatRoom>*/}
-            {/*<RoomModal socket={socket}></RoomModal>*/}
+            <RoomModal socket={socket} user={userName}></RoomModal>
             <div className='flex justify-center content-center'>
 
                 <form id="form" action="" onSubmit={e => {
                     e.preventDefault();
 
 
-                }}>
-                    <div>
-                        <ul className="h-[300px] w-[500px] overflow-auto">
+                }}
+                >
+                    <div className="outline max-w-2xl">
+                        <ul className="h-[300px] w-[500px] overflow-auto list-none">
                             <Messages messages={listOfMsg} user={userName}></Messages>
                         </ul>
                     </div>
 
                     <input type="text" placeholder="Type here"
-                           className="input input-bordered input-accent w-full max-w-xs"
+                           className="input input-bordered input-accent w-full max-w-md"
                            value={fieldState} autoComplete="off" autoFocus={true}
                            onChange={(event) => {
                                setFieldState(event.target.value);
@@ -96,7 +78,7 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
                            ref={inputRef}
                     />
 
-                    <button className='btn btn-accent' onClick={sendMessage}>Send</button>
+                    <button className='btn btn-accent mt-3.5' onClick={sendMessage}>Send</button>
                 </form>
 
 

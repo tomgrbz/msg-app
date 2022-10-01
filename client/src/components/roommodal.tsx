@@ -3,7 +3,7 @@ import {Button, Modal} from "react-daisyui";
 import {Link} from "react-router-dom";
 import {Socket} from "socket.io-client";
 
-export const RoomModal = ({socket}: {socket: Socket}) => {
+export const RoomModal = ({socket, user}: {socket: Socket, user: string}) => {
     const [visible, setVisible] = useState<boolean>(false)
     const [newRoom, setNewRoom] = useState("")
 
@@ -17,26 +17,18 @@ export const RoomModal = ({socket}: {socket: Socket}) => {
     }
 
     return (
-        <div className="font-sans">
-            <Button onClick={toggleVisible}>Open Modal</Button>
-            <Modal open={visible} onClickBackdrop={toggleVisible}>
-                <Modal.Header className="font-bold">
-                    Join New Room
-                </Modal.Header>
-
-                <Modal.Body>
+        <div className="font-sans mt-[200px] mx-10">
                     <p>Please Enter the new room you'd like to join!</p>
                     <input type="text" autoComplete="off" placeholder="Room" onChange={e => {
                         setNewRoom(e.target.value)
 
                     }}/>
-                    <Link to={`/chat/${newRoom}`} key={newRoom}>
+                    <Link to={`/chat/${newRoom}/${user}`} key={newRoom}>
                         <Button onClick={joinRoom}>
                             Join
                         </Button>
                     </Link>
-                </Modal.Body>
-            </Modal>
+
         </div>
     )
 }
