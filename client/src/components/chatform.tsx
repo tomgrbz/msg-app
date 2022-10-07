@@ -12,7 +12,7 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
     const [user, setUser] = useState<string>("")
     const [room, setRoom] = useState<string>("")
     const [fieldState, setFieldState] = useState<string>("")
-    const [messageReceived, setMessageReceived] = useState<string>("")
+    const [messageReceived, setMessageReceived] = useState<string | undefined>(undefined)
     const [listOfMsg, setListOfMsg] = useState<any[]>([])
 
     const inputRef = useRef(null) as any
@@ -22,20 +22,23 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
             socket.on('received message', (msg: string, user: string, r: string) => {
                 setMessageReceived(msg)
                 setUser(user)
-                console.log(r)
-                console.log(socket)
-                setListOfMsg(listOfMsg=>[...listOfMsg, {message:msg, user: user}])
+                console.log(user)
+                console.log(messageReceived)
+                setListOfMsg(listOfMsg=>[...listOfMsg, {message: msg, user: user}])
             })
+            return () => {
+                socket.off('received message')
+            }
         },
         [])
 
-    useEffect(() => {
-        setRoom(roomId)
-        setUser(userName)
-        console.log('changed rooms')
-        setListOfMsg([])
-        joinNewRoom().then(r => console.log('Joined new Room!'))
-    }, [roomId, userName])
+    // useEffect(() => {
+    //     setRoom(roomId)
+    //     setUser(userName)
+    //     console.log('changed rooms')
+    //     setListOfMsg([])
+    //     joinNewRoom().then(r => console.log('Joined new Room!'))
+    // }, [roomId, userName])
 
     const joinNewRoom = async () => {
         await socket.emit("join room", roomId)
@@ -60,9 +63,7 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
                 <form id="form" action="" onSubmit={e => {
                     e.preventDefault();
 
-
-                }}
-                >
+                }}>
                     <div className="outline max-w-2xl">
                         <ul className="h-[300px] w-[500px] overflow-auto list-none">
                             <Messages messages={listOfMsg} user={userName}></Messages>
