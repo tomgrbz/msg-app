@@ -1,5 +1,5 @@
 // This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// learn more about it in the docs: https://pris.ly/d/db-schema
 
 generator client {
   provider = "prisma-client-js"
@@ -16,18 +16,20 @@ model User {
   name      String   @db.VarChar(64)
   socketId  String   @db.VarChar(255) @unique
   messages  Message[]
-  rooms     Room[]
 }
 
 model Message {
   id        Int      @id @default(autoincrement())
   message   String   @db.VarChar(255)
   user      User?    @relation(fields: [userId], references: [id])
-  userId    Int?      
+  userId    Int?
+  room      String   @db.VarChar(255)
+//  room      Room?    @relation(fields: [roomId], references: [id])
+//  roomId    Int?
 }
 
-model Room {
-  id       Int       @id @default(autoincrement())
-  name     String    @db.VarChar(255)
-  users    User[]
-}
+//model Room {
+//  id       Int       @id @default(autoincrement())
+//  name     String    @db.VarChar(255)
+//  messages Message[]
+//}

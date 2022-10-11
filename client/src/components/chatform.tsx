@@ -24,6 +24,7 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
                 setUser(user)
                 console.log(user)
                 console.log(messageReceived)
+                console.log(r)
                 setListOfMsg(listOfMsg=>[...listOfMsg, {message: msg, user: user}])
             })
             return () => {
@@ -32,13 +33,13 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
         },
         [])
 
-    // useEffect(() => {
-    //     setRoom(roomId)
-    //     setUser(userName)
-    //     console.log('changed rooms')
-    //     setListOfMsg([])
-    //     joinNewRoom().then(r => console.log('Joined new Room!'))
-    // }, [roomId, userName])
+    useEffect(() => {
+        setRoom(roomId)
+        setUser(userName)
+        console.log('changed rooms to ' + room)
+        setListOfMsg([])
+        //joinNewRoom().then(r => console.log('Joined new Room!'))
+    }, [roomId, userName])
 
     const joinNewRoom = async () => {
         await socket.emit("join room", roomId)
