@@ -3,14 +3,22 @@ const {PrismaClient} = require('@prisma/client')
 const db = new PrismaClient()
 
 const prismaJoin = async (room, userName, socketId) => {
-
-    await db.user.create({
-        data: {
-            name: userName,
+    let userExists = await db.user.count({
+        where: {
             socketId: socketId,
-            messages: {},
-        }
+        },
     })
+    if (userExists === 0) {
+        await db.user.create({
+            data: {
+                name: userName,
+                socketId: socketId,
+                messages: {},
+            }
+        })
+    }
+
+
     console.log(`${userName} joined ${room} with socId: ${socketId}`)
 
 }
@@ -52,18 +60,14 @@ const addMsg = async (msg, socketId, roomId) => {
     // console.dir(allMsgs, {depth: null})
 }
 
-const retrieveMsgs = async (room, socketId) => {
-    const findUser = await db.user.findFirst({
+const retrieveMsgs = async (room) => {
+    const msgs = await db.message.findMany({
         where: {
-            socketId: socketId
-
+            room: room
         },
-        include: {
-            messages: true
-        }
     })
-    console.dir(findUser, {depth: null})
-    return findUser
+    console.dir(msgs, {depth: null})
+    return msgs
 }
 
 module.exports = {

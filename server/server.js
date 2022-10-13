@@ -1,5 +1,5 @@
-const { prismaJoin, db, addMsg, retrieveMsgs } = require("./db.js")
-const { Server } = require("socket.io")
+const {prismaJoin, db, addMsg, retrieveMsgs} = require("./db.js")
+const {Server} = require("socket.io")
 const express = require('express')
 const http = require('http')
 const cors = require('cors')
@@ -9,12 +9,21 @@ const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
     cors: {
         origin: "http://localhost:3000",
-        methods: ['GET', 'POST']}
-    });
+        methods: ['GET', 'POST']
+    }
+});
 
-// app.get('/msgs', (req, res) => {
-//     res.send()
-// })
+app.get('/rooms/:room', async (req, res) => {
+    let data = await retrieveMsgs(req.params.room)
+    let disconnect = db.$disconnect()
+        .catch(async (e) => {
+            console.error(e)
+            await db.$disconnect()
+            process.exit(1)
+        }).finally(db.$disconnect())
+
+    res.json(data)
+})
 io.on("connection", (socket) => {
 
     socket.on('join room', (data) => {
@@ -23,11 +32,11 @@ io.on("connection", (socket) => {
         prismaJoin(data.room, data.userName, socket.id).then(async () => {
             await db.$disconnect()
         })
-        .catch(async (e) => {
-            console.error(e)
-            await db.$disconnect()
-            process.exit(1)
-        })
+            .catch(async (e) => {
+                console.error(e)
+                await db.$disconnect()
+                process.exit(1)
+            })
     })
 
     socket.on("chat message", (data) => {
@@ -40,14 +49,8 @@ io.on("connection", (socket) => {
             console.error(e)
             await db.$disconnect()
             process.exit(1)
-        })
-        retrieveMsgs(data.id, socket.id).then(async () => {
-            await db.$disconnect()
-        }).catch(async (e) => {
-            console.error(e)
-            await db.$disconnect()
-            process.exit(1)
-        })
+        }).finally(db.$disconnect())
+
     })
 
 

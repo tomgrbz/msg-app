@@ -7,6 +7,7 @@ import {RoomModal} from "./roommodal";
 import {Message} from "./message";
 import {list} from "postcss";
 import {Messages} from "./messages";
+import {useFetch} from "../hooks/usefetch";
 
 export const ChatForm = ({socket}: { socket: Socket }) => {
     const [user, setUser] = useState<string>("")
@@ -14,16 +15,15 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
     const [fieldState, setFieldState] = useState<string>("")
     const [messageReceived, setMessageReceived] = useState<string | undefined>(undefined)
     const [listOfMsg, setListOfMsg] = useState<any[]>([])
+    const [rooms, setRooms] = useState()
 
     const inputRef = useRef(null) as any
     const {roomId, userName}: any = useParams()
-
+    const {loading, data, error} = useFetch(`http://localhost:3001/rooms/${roomId}`)
     useEffect(() => {
             socket.on('received message', (msg: string, user: string, r: string) => {
                 setMessageReceived(msg)
                 setUser(user)
-                console.log(user)
-                console.log(messageReceived)
                 console.log(r)
                 setListOfMsg(listOfMsg=>[...listOfMsg, {message: msg, user: user}])
             })
@@ -36,8 +36,11 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
     useEffect(() => {
         setRoom(roomId)
         setUser(userName)
-        console.log('changed rooms to ' + room)
-        setListOfMsg([])
+        console.log('changed rooms to ' + roomId)
+        setListOfMsg(data.map((v, i)=> {
+            return data[i]['message']
+            }
+        ))
         //joinNewRoom().then(r => console.log('Joined new Room!'))
     }, [roomId, userName])
 
