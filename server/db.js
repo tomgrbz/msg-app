@@ -65,6 +65,9 @@ const retrieveMsgs = async (room) => {
         where: {
             room: room
         },
+        include: {
+            user: true,
+        },
     })
     console.dir(msgs, {depth: null})
     return msgs

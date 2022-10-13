@@ -15,37 +15,46 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
     const [fieldState, setFieldState] = useState<string>("")
     const [messageReceived, setMessageReceived] = useState<string | undefined>(undefined)
     const [listOfMsg, setListOfMsg] = useState<any[]>([])
-    const [rooms, setRooms] = useState()
+    const [rooms, setRooms] = useState<string[]>([])
 
     const inputRef = useRef(null) as any
     const {roomId, userName}: any = useParams()
     const {loading, data, error} = useFetch(`http://localhost:3001/rooms/${roomId}`)
     useEffect(() => {
+
             socket.on('received message', (msg: string, user: string, r: string) => {
                 setMessageReceived(msg)
                 setUser(user)
                 console.log(r)
-                setListOfMsg(listOfMsg=>[...listOfMsg, {message: msg, user: user}])
+                setListOfMsg(listOfMsg => [...listOfMsg, {message: msg, user: user}])
             })
             return () => {
                 socket.off('received message')
             }
         },
         [])
-
+    useEffect(()=> {
+        setListOfMsg(data.map((v: string, i) => {
+                return {message: data[i]['message'], user: data[i]['user']['name']}
+            }
+        ))
+        console.log(data)
+    }, [loading])
     useEffect(() => {
         setRoom(roomId)
         setUser(userName)
+        setRooms([...rooms, roomId])
         console.log('changed rooms to ' + roomId)
-        setListOfMsg(data.map((v, i)=> {
-            return data[i]['message']
-            }
-        ))
-        //joinNewRoom().then(r => console.log('Joined new Room!'))
+        // setListOfMsg(data.map((v: string, i)=> {
+        //     return data[i]['message']
+        //     }
+        // ))
+        console.log(error)
+        // joinNewRoom().then(r => console.log('Joined new Room!'))
     }, [roomId, userName])
 
     const joinNewRoom = async () => {
-        await socket.emit("join room", roomId)
+        await socket.emit("join room", {room: roomId, userName: userName})
     }
     const sendMessage = async () => {
         if (fieldState !== '') {
@@ -61,7 +70,7 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
     return (
         <div className="">
             {/*<ChatRoom roomId={room}></ChatRoom>*/}
-            <RoomModal socket={socket} user={userName}></RoomModal>
+            <RoomModal socket={socket} user={userName} rooms={rooms}></RoomModal>
             <div className='flex justify-center content-center'>
 
                 <form id="form" action="" onSubmit={e => {
@@ -69,9 +78,11 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
 
                 }}>
                     <div className="outline max-w-2xl">
-                        <ul className="h-[300px] w-[500px] overflow-auto list-none">
-                            <Messages messages={listOfMsg} user={userName}></Messages>
-                        </ul>
+                        {loading ? <p>loading msgs</p> :
+                            <ul className="h-[300px] w-[500px] overflow-auto list-none">
+                                <Messages messages={listOfMsg} user={userName}></Messages>
+                            </ul>
+                        }
                     </div>
 
                     <input type="text" placeholder="Type here"
