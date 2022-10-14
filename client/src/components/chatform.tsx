@@ -39,7 +39,7 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
             }
         ))
         console.log(data)
-    }, [loading])
+    }, [data])
     useEffect(() => {
         setRoom(roomId)
         setUser(userName)

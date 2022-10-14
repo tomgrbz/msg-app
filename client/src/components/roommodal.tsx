@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {Button, Modal} from "react-daisyui";
 import {Link} from "react-router-dom";
 import {Socket} from "socket.io-client";
@@ -13,7 +13,7 @@ export const RoomModal = ({socket, user, rooms}: { socket: Socket, user: string,
 
     return (
         <div className="font-sans mt-[200px] mx-10">
-            {rooms.map((v, i) => {
+            {rooms.filter((v, i, a) => a.indexOf(v) === i).map((v, i) => {
                 return (<Link
                     to={`/chat/${v}/${user}`}
                               key={i}>
