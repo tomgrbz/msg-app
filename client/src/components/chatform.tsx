@@ -63,15 +63,15 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
         <div className="">
             {/*<ChatRoom roomId={room}></ChatRoom>*/}
             <RoomModal socket={socket} user={userName} rooms={rooms}></RoomModal>
-            <div className='flex justify-center content-center'>
+            <div className='flex justify-center content-center mt-5 pt-5'>
 
                 <form id="form" action="" onSubmit={e => {
                     e.preventDefault();
 
                 }}>
-                    <div className="outline max-w-2xl w-">
+                    <div className="outline">
                         {loading ? <p>loading msgs</p> :
-                            <ul className="h-[300px] w-[500px] overflow-auto list-none">
+                            <ul className="min-h-[300px] min-w-[250px] w-[800px] h-[500px] flex-wrap overflow-auto list-none scroll-smooth">
                                 <Messages messages={listOfMsg} user={userName}></Messages>
                             </ul>
                         }
