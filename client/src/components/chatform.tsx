@@ -33,7 +33,7 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
             }
         },
         [])
-    useEffect(()=> {
+    useEffect(() => {
         setListOfMsg(data.map((v: string, i) => {
                 return {message: data[i]['message'], user: data[i]['user']['name']}
             }
@@ -45,17 +45,9 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
         setUser(userName)
         setRooms([...rooms, roomId])
         console.log('changed rooms to ' + roomId)
-        // setListOfMsg(data.map((v: string, i)=> {
-        //     return data[i]['message']
-        //     }
-        // ))
         console.log(error)
-        // joinNewRoom().then(r => console.log('Joined new Room!'))
     }, [roomId, userName])
 
-    const joinNewRoom = async () => {
-        await socket.emit("join room", {room: roomId, userName: userName})
-    }
     const sendMessage = async () => {
         if (fieldState !== '') {
             await socket.emit("chat message", {msg: fieldState, id: room, user: userName});
@@ -77,24 +69,27 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
                     e.preventDefault();
 
                 }}>
-                    <div className="outline max-w-2xl">
+                    <div className="outline max-w-2xl w-">
                         {loading ? <p>loading msgs</p> :
                             <ul className="h-[300px] w-[500px] overflow-auto list-none">
                                 <Messages messages={listOfMsg} user={userName}></Messages>
                             </ul>
                         }
                     </div>
+                    <div className="max-w-2xl mt-3">
+                        <span>
+                        <input type="text" placeholder="Type here"
+                               className="input input-bordered input-accent w-96 max-w-md"
+                               value={fieldState} autoComplete="off" autoFocus={true}
+                               onChange={(event) => {
+                                   setFieldState(event.target.value);
+                               }}
+                               ref={inputRef}
+                        />
 
-                    <input type="text" placeholder="Type here"
-                           className="input input-bordered input-accent w-full max-w-md"
-                           value={fieldState} autoComplete="off" autoFocus={true}
-                           onChange={(event) => {
-                               setFieldState(event.target.value);
-                           }}
-                           ref={inputRef}
-                    />
-
-                    <button className='btn btn-accent mt-3.5' onClick={sendMessage}>Send</button>
+                        <button className='btn btn-accent mt-3.5 ml-3' onClick={sendMessage}>Send</button>
+                            </span>
+                    </div>
                 </form>
 
 
