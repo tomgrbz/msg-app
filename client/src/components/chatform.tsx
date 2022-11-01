@@ -6,67 +6,48 @@ import {ChatRoom} from "./chatroom";
 import {RoomModal} from "./roommodal";
 import {Message} from "./message";
 import {list} from "postcss";
-
-class ChatMessage {
-    author: string | undefined;
-    message: string;
-
-    constructor(author: string, message: string) {
-        this.author = author;
-        this.message = message
-    }
-}
-
-class Room {
-    name: string | undefined;
-    messages: ChatMessage[];
-
-    constructor(name: string, messages: ChatMessage[]) {
-        this.name = name;
-        this.messages = messages
-    }
-}
+import {Messages} from "./messages";
+import {useFetch} from "../hooks/usefetch";
 
 export const ChatForm = ({socket}: { socket: Socket }) => {
+    const [user, setUser] = useState<string>("")
     const [room, setRoom] = useState<string>("")
     const [fieldState, setFieldState] = useState<string>("")
-    const [messageReceived, setMessageReceived] = useState<string>("")
-    const [listOfMsg, setListOfMsg] = useState<ChatMessage[]>([])
-    const [listOfRoom, setListOfRoom] = useState<Room[]>([])
-
+    const [messageReceived, setMessageReceived] = useState<string | undefined>(undefined)
+    const [listOfMsg, setListOfMsg] = useState<any[]>([])
+    const [rooms, setRooms] = useState<string[]>([])
 
     const inputRef = useRef(null) as any
     const {roomId, userName}: any = useParams()
-
-
-    const displayMessages: JSX.Element[] =
-        listOfMsg.map((v, i) => {
-                return (
-                    <Message key={i} userName={v.author} content={v.message}></Message>
-                )
-            })
-
-
-
+    const {loading, data, error} = useFetch(`http://localhost:3001/rooms/${roomId}`)
     useEffect(() => {
+
             socket.on('received message', (msg: string, user: string, r: string) => {
                 setMessageReceived(msg)
+                setUser(user)
                 console.log(r)
-                let newAuthor = new ChatMessage(user, msg)
-                setListOfMsg([...listOfMsg, newAuthor])
+                setListOfMsg(listOfMsg => [...listOfMsg, {message: msg, user: user}])
             })
+            return () => {
+                socket.off('received message')
+            }
         },
-        [displayMessages])
-
+        [])
+    useEffect(() => {
+        setListOfMsg(data.map((v: string, i) => {
+                return {message: data[i]['message'], user: data[i]['user']['name']}
+            }
+        ))
+        console.log(data)
+    }, [data])
     useEffect(() => {
         setRoom(roomId)
-        setListOfMsg([])
-        joinNewRoom().then(r => console.log('Joined new Room!'))
-    }, [roomId])
+        setUser(userName)
+        setRooms([...rooms, roomId])
+        console.log('changed rooms to ' + roomId)
+        console.log(error)
+    }, [roomId, userName])
 
-    const joinNewRoom = async () => {
-        await socket.emit("join room", roomId)
-    }
     const sendMessage = async () => {
         if (fieldState !== '') {
             await socket.emit("chat message", {msg: fieldState, id: room, user: userName});
@@ -75,37 +56,40 @@ export const ChatForm = ({socket}: { socket: Socket }) => {
         autoFocus()
 
     }
-
     const autoFocus = () => {
         inputRef.current.focus()
     }
     return (
-        <div className="mockup-window border bg-[length:200px_100px]">
-            <ChatRoom roomId={room}></ChatRoom>
-            <RoomModal socket={socket}></RoomModal>
+        <div className="">
+            {/*<ChatRoom roomId={room}></ChatRoom>*/}
+            <RoomModal socket={socket} user={userName} rooms={rooms}></RoomModal>
             <div className='flex justify-center content-center'>
 
                 <form id="form" action="" onSubmit={e => {
                     e.preventDefault();
 
-
                 }}>
-                    <div>
-                        <ul className="h-[300px] w-[500px] overflow-auto">
-                            {displayMessages}
-                        </ul>
+                    <div className="outline max-w-2xl w-">
+                        {loading ? <p>loading msgs</p> :
+                            <ul className="h-[300px] w-[500px] overflow-auto list-none">
+                                <Messages messages={listOfMsg} user={userName}></Messages>
+                            </ul>
+                        }
                     </div>
+                    <div className="max-w-2xl mt-3">
+                        <span>
+                        <input type="text" placeholder="Type here"
+                               className="input input-bordered input-accent w-96 max-w-md"
+                               value={fieldState} autoComplete="off" autoFocus={true}
+                               onChange={(event) => {
+                                   setFieldState(event.target.value);
+                               }}
+                               ref={inputRef}
+                        />
 
-                    <input type="text" placeholder="Type here"
-                           className="input input-bordered input-accent w-full max-w-xs"
-                           value={fieldState} autoComplete="off" autoFocus={true}
-                           onChange={(event) => {
-                               setFieldState(event.target.value);
-                           }}
-                           ref={inputRef}
-                    />
-
-                    <button className='btn btn-accent' onClick={sendMessage}>Send</button>
+                        <button className='btn btn-accent mt-3.5 ml-3' onClick={sendMessage}>Send</button>
+                            </span>
+                    </div>
                 </form>
 
 

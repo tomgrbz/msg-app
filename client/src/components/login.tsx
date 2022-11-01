@@ -9,7 +9,7 @@ export const Login = ({socket}: { socket: Socket }) => {
     const [room, setRoom] = useState('');
     const joinRoom = async () => {
         console.log(room)
-        await socket.emit("join room", room)
+        await socket.emit("join room", {room, userName})
     }
     return (
         <div className="flex justify-center w-full items-center mt-72">
